@@ -1,0 +1,32 @@
+{% load leaflet_tags %}
+
+<head>
+    {% leaflet_js %}
+    {% leaflet_css %}
+</head>
+
+<body>
+    <script>
+        function map_init_basic (map, options) {
+            var myLines = [{% for line in polyline %}
+                           {
+                                "type": "LineString",
+                                "coordinates": {{ line }}
+                           },
+                           {% endfor %}
+            ];
+            L.geoJSON(myLines).addTo(map);
+            map.setView({{zoom}}, 10);
+        }
+    </script>
+    <select id="org" name="route_list" onchange="if (this.value) window.location.href=this.value">
+      <option  value="" selected="selected">Pick a route</option>
+      {% for r in routes %}
+        <option value="{% url 'route_view' pk=r.id %}">{{r.name}}</option>
+      {% endfor %}
+    </select>
+
+    {% leaflet_map "bikeroute" callback="window.map_init_basic" %}
+     <a href="/api/">Bike Route API</a>
+
+</body>
